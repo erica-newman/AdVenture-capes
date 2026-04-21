@@ -21,7 +21,6 @@ export default async function ProspectPage({ params }) {
   return (
     <>
       <style>{CSS}</style>
-      <ProspectBanner prospect={prospect} />
       <Nav />
       <a
         href={`/admin?edit=${prospect.slug}`}

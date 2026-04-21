@@ -236,6 +236,15 @@ export default function AdminClient({ prospects, upsertProspect, removeProspect,
                 ))}
               </div>
 
+              <label style={labelStyle}>Pinned Case Studies (optional — shown first, comma-separated IDs)</label>
+              <input
+                name="pinnedCaseStudies"
+                type="text"
+                defaultValue={editingData?.pinnedCaseStudies?.join(", ")}
+                placeholder="e.g. woodspoon, nasdaq, grown-brilliance"
+                style={inputStyle}
+              />
+
               <label style={labelStyle}>Custom Hero Message (optional — leave blank for auto-generated)</label>
               <input
                 name="heroCustom" type="text"

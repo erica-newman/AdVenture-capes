@@ -15,6 +15,8 @@ async function upsertProspect(formData) {
   const industry = formData.get("industry");
   const priorities = formData.getAll("priorities");
   const contentFlags = formData.getAll("contentFlags");
+  const pinnedCaseStudies = (formData.get("pinnedCaseStudies") || "")
+    .split(",").map(s => s.trim()).filter(Boolean);
   const callNotes = formData.get("callNotes")?.trim();
   const heroCustom = formData.get("heroCustom")?.trim();
   const slugInput = formData.get("slug")?.trim();
@@ -22,7 +24,7 @@ async function upsertProspect(formData) {
   const slug = slugInput ||
     company.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-  await saveProspect(slug, { name, company, role, industry, priorities, contentFlags, callNotes, heroCustom });
+  await saveProspect(slug, { name, company, role, industry, priorities, contentFlags, pinnedCaseStudies, callNotes, heroCustom });
   revalidatePath(`/${slug}`);
   redirect(`/${slug}`);
 }
