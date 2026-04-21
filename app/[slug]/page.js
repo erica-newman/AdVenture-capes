@@ -23,7 +23,7 @@ export default async function ProspectPage({ params }) {
       <style>{CSS}</style>
       <ProspectBanner prospect={prospect} />
       <Nav />
-      <
+      <a
         href={`/admin?edit=${prospect.slug}`}
         style={{
           position:"fixed", bottom:24, right:24, zIndex:9999,
