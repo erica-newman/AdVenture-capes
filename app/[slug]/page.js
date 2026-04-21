@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { getProspect } from "../../lib/storage.js";
 import { matchCaseStudies, getHighlightedServices, buildHeroSubheading } from "../../lib/match.js";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }) {
   const prospect = await getProspect(params.slug);
   if (!prospect) return { title: "AdVenture Media" };
@@ -19,14 +21,27 @@ export default async function ProspectPage({ params }) {
   return (
     <>
       <style>{CSS}</style>
+      <ProspectBanner prospect={prospect} />
       <Nav />
-      {prospect.callNotes && <ProspectBanner prospect={prospect} />}
+      <
+        href={`/admin?edit=${prospect.slug}`}
+        style={{
+          position:"fixed", bottom:24, right:24, zIndex:9999,
+          background:"#000C5D", color:"#fff", textDecoration:"none",
+          padding:"10px 18px", borderRadius:100, fontSize:"0.8rem",
+          fontWeight:700, fontFamily:"system-ui,sans-serif",
+          boxShadow:"0 4px 16px rgba(0,0,0,0.25)",
+          display:"flex", alignItems:"center", gap:6,
+        }}
+      >
+        ✏ Edit Page
+      </a>
       <Hero prospect={prospect} heroSub={heroSub} />
       <About />
-      <Services highlighted={highlightedServices} />
+      <Services highlighted={highlightedServices} prospect={prospect} />
       <Creative />
       <AiTransformation />
-      <WhyUs />
+      <WhyUs prospect={prospect} />
       <CaseStudies studies={caseStudies} />
       <Clients />
       <Testimonials />
@@ -112,9 +127,9 @@ function Hero({ prospect, heroSub }) {
         <a href="#services" className="btn btn-outline">Our Services</a>
         <div className="hero-stats">
           <div className="stat-item"><span className="stat-num">500<sup>+</sup></span><span className="stat-label">Clients Served</span></div>
-          <div className="stat-item"><span className="stat-num">$0 → $200M</span><span className="stat-label">Revenue Built in 18 Months</span></div>
-          <div className="stat-item"><span className="stat-num">87–92%</span><span className="stat-label">Creative Cost Reduction</span></div>
+          <div className="stat-item"><span className="stat-num">12<sup>+</sup></span><span className="stat-label">Years in Business</span></div>
           <div className="stat-item"><span className="stat-num">300K<sup>+</sup></span><span className="stat-label">Academy Students</span></div>
+          <div className="stat-item"><span className="stat-num">#1</span><span className="stat-label">Google Premier Partner</span></div>
         </div>
       </div>
     </section>
@@ -135,7 +150,6 @@ function About() {
             <p>AdVenture Media was founded in 2012 by Isaac Rudansky with a simple belief: that businesses of every size deserve the same caliber of strategy as the world's largest brands. Twelve years later, we manage campaigns for Fortune 500 companies, PE-backed portfolio brands, funded startups, and boutique DTC businesses alike.</p>
             <p>Headquartered in New York (Woodmere, NY), with offices in Philadelphia and Fort Lauderdale, our team of ~57 specialists brings deep expertise across paid media, AI-native creative production, and enterprise AI implementation.</p>
             <p>What sets us apart is what you feel on the first call: we show up having done our homework. Every recommendation is tied to your margins, your seasonality, your competitive landscape. We don't run generic playbooks. We build strategy around your business.</p>
-            <p><strong>Our approach to strategy:</strong> Most engagements begin with a dedicated strategy phase — typically 6–8 weeks — before any management begins. We audit your current state, map your competitive landscape, define your unit economics, and deliver a custom roadmap. You own it whether you work with us long-term or not.</p>
             <p><strong>Our approach to AI:</strong> We've built proprietary AI systems on top of the ad platforms. Our Trigger Intelligence System identifies high-intent prospects at the exact moment they're ready to act. Our AI creative pipeline generates, tests, and iterates ads at a speed no traditional agency can match. AI handles the volume; our strategists handle the judgment.</p>
             <h3 className="values-heading">Our Five Core Values</h3>
             <div className="values-grid">
@@ -167,60 +181,98 @@ function About() {
 /* =============================================
    SERVICES
 ============================================= */
-function Services({ highlighted }) {
-  const groups = [
-    {
-      label: "Paid Media",
-      cards: [
-        { color:"purple", title:"Paid Search — Google & Microsoft", desc:"High-intent capture via smart bidding, keyword architecture, and quality score optimization.", tags:["Google Ads","Microsoft/Bing","GLSA","Shopping"] },
-        { color:"red",    title:"Paid Social — Meta & LinkedIn",    desc:"Audience-first social advertising. Creative strategy, owned data activation, and ROAS-driven campaigns.", tags:["Meta Ads","LinkedIn","Retargeting","Lookalikes"] },
-        { color:"navy",   title:"Ecommerce & Shopping",             desc:"Campaigns designed around LTV, margin, and BFCM spikes. PMax, Dynamic Ads, product feed optimization.", tags:["Google Shopping","PMax","Dynamic Ads","LTV Strategy"] },
-        { color:"purple", title:"Lead Generation & B2B",            desc:"SQL-focused campaigns with CRM integration and intent-based bidding. Pipeline, not just volume.", tags:["SQL Optimization","CRM Integration","Account-Based"] },
-        { color:"red",    title:"Programmatic & YouTube",           desc:"Full-funnel video and display. YouTube campaigns that drive both awareness and direct response.", tags:["YouTube","Display","Programmatic"] },
-        { color:"navy",   title:"Conversion Rate Optimization",     desc:"We build and A/B test landing pages that can 10x conversion rates — turning ad spend into pipeline.", tags:["Landing Pages","A/B Testing","UX"] },
-      ],
-    },
-    {
-      label: "Creative & Content",
-      cards: [
-        { color:"purple", title:"AI-Native Video Production",       desc:"Short-form spots for Meta, YouTube, and CTV — 8–15 variants per concept, produced in days not months.", tags:["Meta Video","YouTube","CTV","UGC"] },
-        { color:"red",    title:"Performance Static & Display",     desc:"High-impact static ads engineered for CTR with continuous rotation every 2–4 weeks for high-spend accounts.", tags:["Social Static","Display","DOOH"] },
-        { color:"navy",   title:"Custom Music & Sound Design",      desc:"Original audio built for ads — not licensed stock. Custom music and sound tailored to brand and platform.", tags:["Original Music","Voiceover","Sound Design"] },
-      ],
-    },
-    {
-      label: "Strategy & AI",
-      cards: [
-        { color:"purple", title:"AI Transformation & Implementation", desc:"Enterprise AI infrastructure — custom-built agents, dashboards, automations, and workflows. Real tools, real adoption, real ROI.", tags:["Custom AI Agents","Workflow Automation","Change Mgmt"] },
-        { color:"red",    title:"SEO & Answer Engine Optimization",   desc:"Paid and organic working as one. SEO strategy paired with AEO to capture AI-driven search.", tags:["SEO","AEO","Content Strategy"] },
-        { color:"navy",   title:"Training & Consulting",              desc:"In-house team training and AdVenture Academy — 200+ hours of training used by 300,000 students worldwide.", tags:["Consulting","Team Training","Academy"] },
-      ],
-    },
-  ];
+const ALL_SERVICE_CARDS = [
+  { color:"purple", title:"Paid Search — Google & Microsoft", desc:"High-intent capture via smart bidding, keyword architecture, and quality score optimization.", tags:["Google Ads","Microsoft/Bing","GLSA","Shopping"] },
+  { color:"red",    title:"Paid Social — Meta & LinkedIn",    desc:"Audience-first social advertising. Creative strategy, owned data activation, and ROAS-driven campaigns.", tags:["Meta Ads","LinkedIn","Retargeting","Lookalikes"] },
+  { color:"navy",   title:"Ecommerce & Shopping",             desc:"Campaigns designed around LTV, margin, and BFCM spikes. PMax, Dynamic Ads, product feed optimization.", tags:["Google Shopping","PMax","Dynamic Ads","LTV Strategy"] },
+  { color:"purple", title:"Lead Generation & B2B",            desc:"SQL-focused campaigns with CRM integration and intent-based bidding. Pipeline, not just volume.", tags:["SQL Optimization","CRM Integration","Account-Based"] },
+  { color:"red",    title:"Programmatic & YouTube",           desc:"Full-funnel video and display. YouTube campaigns that drive both awareness and direct response.", tags:["YouTube","Display","Programmatic"] },
+  { color:"navy",   title:"Conversion Rate Optimization",     desc:"We build and A/B test landing pages that can 10x conversion rates — turning ad spend into pipeline.", tags:["Landing Pages","A/B Testing","UX"] },
+  { color:"purple", title:"AI-Native Video Production",       desc:"Short-form spots for Meta, YouTube, and CTV — 8–15 variants per concept, produced in days not months.", tags:["Meta Video","YouTube","CTV","UGC"] },
+  { color:"red",    title:"Performance Static & Display",     desc:"High-impact static ads engineered for CTR with continuous rotation every 2–4 weeks for high-spend accounts.", tags:["Social Static","Display","DOOH"] },
+  { color:"navy",   title:"Custom Music & Sound Design",      desc:"Original audio built for ads — not licensed stock. Custom music and sound tailored to brand and platform.", tags:["Original Music","Voiceover","Sound Design"] },
+  { color:"purple", title:"AI Transformation & Implementation", desc:"Enterprise AI infrastructure — custom-built agents, dashboards, automations, and workflows. Real tools, real adoption, real ROI.", tags:["Custom AI Agents","Workflow Automation","Change Mgmt"] },
+  { color:"red",    title:"SEO & Answer Engine Optimization",   desc:"Paid and organic working as one. SEO strategy paired with AEO to capture AI-driven search.", tags:["SEO","AEO","Content Strategy"] },
+  { color:"navy",   title:"Training & Consulting",              desc:"In-house team training and AdVenture Academy — 200+ hours of training used by 300,000 students worldwide.", tags:["Consulting","Team Training","Academy"] },
+];
+
+function Services({ highlighted, prospect }) {
+  const flags = prospect?.contentFlags || [];
+  const cards = ALL_SERVICE_CARDS.map(c => {
+    if (c.title === "Paid Search — Google & Microsoft" && flags.includes("appCampaigns")) {
+      return {
+        ...c,
+        desc: "High-intent capture via smart bidding, keyword architecture, and quality score optimization — including iOS and Android App Campaigns with AppsFlyer and Firebase attribution.",
+        tags: [...c.tags, "App Campaigns", "AppsFlyer", "Firebase"],
+      };
+    }
+    return c;
+  });
+  const priorityCards = cards.filter(c => highlighted.includes(c.title));
+  const otherCards    = cards.filter(c => !highlighted.includes(c.title));
+  const hasPriorities = priorityCards.length > 0;
+
+  function Card({ c }) {
+    return (
+      <div className="service-card service-highlighted">
+        <div className={`service-bar sbar-${c.color}`}></div>
+        <h3>{c.title}</h3>
+        <p>{c.desc}</p>
+        <div className="service-tags">
+          {c.tags.map(t => <span key={t} className="tag">{t}</span>)}
+        </div>
+      </div>
+    );
+  }
+
+  function OtherCard({ c }) {
+    return (
+      <div className="service-card">
+        <div className={`service-bar sbar-${c.color}`}></div>
+        <h3>{c.title}</h3>
+        <p>{c.desc}</p>
+        <div className="service-tags">
+          {c.tags.map(t => <span key={t} className="tag">{t}</span>)}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section id="services" className="section bg-white">
       <div className="section-inner">
         <p className="section-label">What We Do</p>
-        <h2>Three practice areas. One integrated team.</h2>
-        <p className="section-sub">Paid media, creative production, and enterprise AI — each is a standalone practice, each is stronger together.</p>
-        {groups.map((g) => (
-          <div key={g.label}>
-            <div className="service-group-label">{g.label}</div>
+        {hasPriorities ? (
+          <>
+            <h2>Built for {prospect.company}.</h2>
+            <p className="section-sub">Based on what matters most to you, here's how we'd approach your growth.</p>
+            <div className="service-group-label">Priority Focus</div>
             <div className="services-grid">
-              {g.cards.map((c) => (
-                <div key={c.title} className={`service-card${highlighted.includes(c.title) ? " service-highlighted" : ""}`}>
-                  <div className={`service-bar sbar-${c.color}`}></div>
-                  <h3>{c.title}</h3>
-                  <p>{c.desc}</p>
-                  <div className="service-tags">
-                    {c.tags.map(t => <span key={t} className="tag">{t}</span>)}
-                  </div>
-                </div>
-              ))}
+              {priorityCards.map(c => <Card key={c.title} c={c} />)}
             </div>
+            {otherCards.length > 0 && (
+              <>
+                <div className="service-group-label" style={{marginTop:32}}>Additional Capabilities</div>
+                <div className="services-grid">
+                  {otherCards.map(c => <OtherCard key={c.title} c={c} />)}
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <h2>Three practice areas. One integrated team.</h2>
+            <p className="section-sub">Paid media, creative production, and enterprise AI — each is a standalone practice, each is stronger together.</p>
+            <div className="services-grid">
+              {ALL_SERVICE_CARDS.map(c => <OtherCard key={c.title} c={c} />)}
+            </div>
+          </>
+        )}
+        {flags.includes("complianceReady") && (
+          <div className="compliance-note">
+            ✓ We have direct experience managing advertising for Google-certified financial services and crypto companies, including navigating compliance requirements and certification across US, UK, and EU markets.
           </div>
-        ))}
+        )}
       </div>
     </section>
   );
@@ -414,12 +466,25 @@ function AiTransformation() {
 /* =============================================
    WHY US
 ============================================= */
-function WhyUs() {
+function WhyUs({ prospect = {} }) {
+  const flags = prospect.contentFlags || [];
+  const emphasizeSpeed   = flags.includes("emphasizeSpeed");
+  const hideStrategyPhase = flags.includes("hideStrategyPhase");
+
+  let card04;
+  if (emphasizeSpeed) {
+    card04 = { n:"04", title:"We Move Fast — Here's Week One", body:"From signed contract to first account optimizations in days, not weeks. Quick wins identified within 48 hours of access, structural improvements underway in week one, full data-backed strategy delivered within two weeks. No onboarding theatre." };
+  } else if (hideStrategyPhase) {
+    card04 = { n:"04", title:"Strategic Roadmap — Built for Your Business", body:"Every engagement starts with a custom roadmap tied to your business model, competitive landscape, and margin targets. We don't run generic playbooks — strategy is built around your specific unit economics from day one." };
+  } else {
+    card04 = { n:"04", title:"Strategy Before Management", body:"For most engagements, we start with a strategy-only phase (typically 6–8 weeks). You get a custom roadmap built on your business, not a generic onboarding checklist. Management follows strategy — not the other way around." };
+  }
+
   const diffs = [
     { n:"01", title:"AI as Infrastructure, Not a Feature",    body:"We don't just use platform AI — we've built proprietary systems on top of it. SherpaOS powers our creative decisions. Our Trigger Intelligence System identifies prospects at the exact moment they're ready to buy. Custom builds run inside client organizations. AI is in the foundation of everything we do." },
     { n:"02", title:"Profit-First Framework",                 body:"We don't optimize for vanity metrics. Every campaign is built around your actual unit economics — margin, LTV, break-even ROAS. If we can't make your advertising profitable, we'll tell you before we take your money." },
     { n:"03", title:"We Wrote the Book. Literally.",          body:"Our founder authored the #1 bestselling book on digital advertising. Our CEO was invited by Google to lecture in four countries and published Join or Die. We don't just follow best practices — we define them and publish them." },
-    { n:"04", title:"Strategy Before Management",             body:"For most engagements, we start with a strategy-only phase (typically 6–8 weeks). You get a custom roadmap built on your business, not a generic onboarding checklist. Management follows strategy — not the other way around." },
+    card04,
     { n:"05", title:"Range Without Compromise",               body:"We work with $1,500/month boutiques and $600,000/month publicly traded companies. That range means our playbooks are tested at every scale. What worked for Grown Brilliance ($0 to $200M in 18 months) informs what we build for a founder launching their first campaign." },
     { n:"06", title:"Relationship Over Retainer",             body:"Clients who've been with us for 5+ years don't stay because of a contract — they stay because we've become part of their team. We're known for intellectual honesty: if something isn't working, we say so." },
   ];
@@ -827,6 +892,9 @@ const CSS = `
   .footer-links { display:flex; gap:24px; }
   .footer-links a { font-size:0.8rem; color:rgba(255,255,255,0.35); text-decoration:none; }
   .footer-links a:hover { color:rgba(255,255,255,0.7); }
+
+  /* compliance callout */
+  .compliance-note { margin-top: 28px; background: rgba(93,48,217,0.06); border: 1px solid rgba(93,48,217,0.2); border-left: 3px solid var(--purple); border-radius: var(--r); padding: 14px 20px; font-size: 0.875rem; color: var(--navy); line-height: 1.65; }
 
   @media (max-width:900px) {
     .services-grid { grid-template-columns:1fr 1fr; }

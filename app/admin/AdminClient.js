@@ -40,9 +40,16 @@ const PRIORITIES = [
   { value: "training",     label: "Training & Consulting" },
 ];
 
-export default function AdminClient({ prospects, upsertProspect, removeProspect }) {
-  const [editing, setEditing] = useState(null); // null = new, string = slug being edited
-  const [showForm, setShowForm] = useState(false);
+const CONTENT_FLAGS = [
+  { value: "hideStrategyPhase", label: "Hide '6–8 week strategy phase' language — replace with neutral roadmap copy" },
+  { value: "emphasizeSpeed",    label: "Emphasize fast onboarding — swap card 04 to 'We Move Fast / Week One' messaging" },
+  { value: "appCampaigns",      label: "Highlight iOS/Android app campaign expertise + AppsFlyer & Firebase attribution" },
+  { value: "complianceReady",   label: "Show compliance note — for crypto, fintech, or other regulated advertisers" },
+];
+
+export default function AdminClient({ prospects, upsertProspect, removeProspect, editSlug }) {
+  const [editing, setEditing] = useState(editSlug || null);
+  const [showForm, setShowForm] = useState(!!editSlug);
 
   const editingData = editing ? prospects[editing] : null;
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
@@ -51,8 +58,8 @@ export default function AdminClient({ prospects, upsertProspect, removeProspect 
     return str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   }
 
-  const [companyVal, setCompanyVal] = useState("");
-  const [slugVal, setSlugVal] = useState("");
+  const [companyVal, setCompanyVal] = useState(editSlug ? (prospects[editSlug]?.company || "") : "");
+  const [slugVal, setSlugVal] = useState(editSlug || "");
 
   function handleCompanyChange(e) {
     setCompanyVal(e.target.value);
@@ -214,6 +221,20 @@ export default function AdminClient({ prospects, upsertProspect, removeProspect 
                 placeholder="e.g. Bill wants to target Fortune 1000 companies during naming decisions. Currently relies entirely on referrals. Interested in AI-powered outreach that gets them in the room before the RFP goes out. Budget around $5–10K/month to start."
                 style={{ ...inputStyle, resize: "vertical" }}
               />
+
+              <label style={labelStyle}>Content Flags — adjust what appears on the page</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+                {CONTENT_FLAGS.map((f) => (
+                  <label key={f.value} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: "0.875rem", color: "#000C5D", cursor: "pointer", padding: "10px 14px", background: "#f7f8fc", border: "1px solid #dde0f0", borderRadius: 8, lineHeight: 1.5 }}>
+                    <input
+                      type="checkbox" name="contentFlags" value={f.value}
+                      defaultChecked={editingData?.contentFlags?.includes(f.value)}
+                      style={{ marginTop: 3, flexShrink: 0 }}
+                    />
+                    {f.label}
+                  </label>
+                ))}
+              </div>
 
               <label style={labelStyle}>Custom Hero Message (optional — leave blank for auto-generated)</label>
               <input
