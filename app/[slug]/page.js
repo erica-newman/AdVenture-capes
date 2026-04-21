@@ -22,19 +22,6 @@ export default async function ProspectPage({ params }) {
     <>
       <style>{CSS}</style>
       <Nav />
-      <a
-        href={`/admin?edit=${prospect.slug}`}
-        style={{
-          position:"fixed", bottom:24, right:24, zIndex:9999,
-          background:"#000C5D", color:"#fff", textDecoration:"none",
-          padding:"10px 18px", borderRadius:100, fontSize:"0.8rem",
-          fontWeight:700, fontFamily:"system-ui,sans-serif",
-          boxShadow:"0 4px 16px rgba(0,0,0,0.25)",
-          display:"flex", alignItems:"center", gap:6,
-        }}
-      >
-        ✏ Edit Page
-      </a>
       <Hero prospect={prospect} heroSub={heroSub} />
       <About />
       <Services highlighted={highlightedServices} prospect={prospect} />
